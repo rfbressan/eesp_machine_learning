@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Causal Forests</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Rafael Felipe Bressan" />
+    <meta name="date" content="2021-02-28" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="fgv2-theme.css" type="text/css" />
+    <link rel="stylesheet" href="fgv2-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="scrollable.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Causal Forests
+## for heterogeneous treatment effects
+### Rafael Felipe Bressan
+### Sao Paulo School of Economics - EESP
+### FGV - Fundação Getúlio Vargas
+### 2021-02-28
+
+---
+
+
+
+# Literature Review
+
+Development of Causal Forest comes from a lineage of papers:
+
+- [Athey and Imbens (2016)](#bib-athey2016recursive)
+  + Recursive partioning, honest trees
+
+--
+- .bold[[Wager and Athey (2018)](#bib-wager2018estimation)]
+  + .bold[From trees to forests. Asymptotics]
+
+--
+- [Athey, Tibshirani, Wager, et al. (2019)](#bib-athey2019generalized)
+  + Trees as a kernel regression
+
+--
+- [Athey and Wager (2019)](#bib-athey2019estimating)
+  + Application to observational data
+  
+
+Other important results and applications
+
+- [Wager, Hastie, and Efron (2014)](#bib-wager2014confidence) - Variance estimation
+- [Oprescu, Syrgkanis, and Wu (2019)](#bib-oprescu2019orthogonal) - Orthogonal Forests
+- [Davis and Heller (2017)](#bib-davis2017using) - Application to summer jobs
+
+---
+# Motivation
+
+* ML methods perform well in practice, but many do not have well established asymptotics or confidence intervals
+
+--
+* Causal Inference is .red[NOT] the same as prediction.
+  + Fundamental problem of causal inference
+
+--
+* Random Forests can potentially address several questions of interest:
+  + Effect heterogeneity among subgroups
+  + Robustness to model specification
+  + Personalized estimates
+
+--
+* Tackle high-dimensional problems
+
+---
+# Potential outcomes framework
+
+We observe a set of i.i.d. units `\(i = 1, \ldots, n\)` whose tuples `\((X_i, Y_i, W_i)\)` are:
+- Feature .bold[vector] `\(X_i\)`,
+- Outcome `\(Y_i \in \mathbb{R}\)`
+- Treatment assignement `\(W_i \in \{0, 1\}\)`
+
+--
+
+The conditional average treatment effect is defined as: `$$\tau(x)=\mathbb{E}[Y_i^{(1)}-Y_i^{(0)}| X_i = x]$$`
+where `\(Y_i^{(0)}\)` and `\(Y_i^{(1)}\)` are the potential outcomes when not treated and treated respectively
+
+---
+# .red[Assumptions]
+
+ML is .bold[not dark magic]! We still need to make assumptions to infer the causal effect.
+
+--
+
+Unconfoundedness must hold:
+`$$\{Y_i^{(0)}, Y_i^{(1)}\}\perp W_i | X_i$$`
+--
+
+All other usual causal inference assumptions: SUTVA, individualistic assignment, probabilistic assignment
+
+---
+# Causal Trees
+
+Units on the same leaf `\(L(x)\)` can be understood as _matched neighbors_
+
+Random forests are essentially an adaptive nearest neighbors estimation
+
+Given traditional causal .red[assumptions], we can treat nearby observations in X-space as having come from a randomized experiment
+
+Natural to estimate the treatment effect locally as:
+
+`$$\hat\tau(x)=\frac{1}{|S_1(x)|}\sum_{i\in S_1(x)}Y_i - \frac{1}{|S_0(x)|}\sum_{i\in S_0(x)}Y_i \qquad\text{(1)}$$`
+
++ `\(S_1(x)=\{i:W_i=1, X_i \in L(x)\}\)` and `\(S_0(x)=\{i:W_i=0, X_i \in L(x)\}\)`
+
+---
+# From Trees to Random Forests 
+
+We have a training set `\(Z_i=\{(X_i, Y_i, W_i)\}_{i=1}^n\)`, a set `\(\mathcal{B}\)` of trees and each tree `\(b\in \mathcal{B}\)` provides an estimation through a base learner `\(T\)`
+
+`$$\hat\tau_b(x)=T(x; Z_i^b)$$`
+
+--
+
+.bold[Random forest idea]: grow and average many different trees based on the same learner
+
+`$$\hat\tau(x)=\frac{1}{|\mathcal{B}|}\sum_{b\in\mathcal{B}}T(x; Z_i^b)$$`
+--
+
+- Different estimations: `\(T(x; Z_i^b) \neq T(x; Z_i^{b'})\)`
+  + Subsampling (without replacement, .red[not bagging!])
+  + Random-split trees: randomly select only `\(m&lt;p\)` features to make the split at each step  
+
+---
+# Two Procedures
+
+.footnotesize[
+.pull-left[
+.blue[Double-sample trees]
+
+1. Random subsample of size `\(s\)` from `\(\{1, \ldots, n\}\)`
+.bold[without replacement], then `\(|\mathcal{I}| = s/2\)` and `\(|\mathcal{J}| = s/2\)`.
+2. Grow a tree via recursive partitioning. The splits are chosen using any data from the `\(\mathcal{J}\)` **and X or W observations** from the `\(\mathcal{I}\)`. Honesty. Minimum leaf size `\(k\)`.
+3. Estimate leafwise responses using only the `\(\mathcal{I}\)`-sample observations.
+
+Double-sample causal trees the prediction estimated is `\(\hat\tau(x)\)` using (1) on the `\(\mathcal{I}\)`-sample. Following Athey and Imbens (2016), the splits of the tree are chosen by maximizing the variance of `\(\hat\tau(X_i)\)` for `\(i\in \mathcal{J}\)`. Each leaf of the tree must contain `\(k\)` or more `\(\mathcal{I}\)`-sample observations of **each** treatment class.
+]]
+
+.footnotesize[
+.pull-right[
+.blue[Propensity trees]
+
+1. Random subsample `\(\mathcal{I} \in \{1,\ldots, n\}\)` of size
+`\(|\mathcal{I}| = s\)` (no replacement).
+2. Train a **classification** tree using sample `\(\mathcal{I}\)` where the
+response is the **treatment assignment**. Using only `\((X_i , W_i)\)` pairs with `\(i\in\mathcal{I}\)`. Each leaf of the tree must have `\(k\)` or more observations of each treatment class.
+3. Estimate `\(\hat\tau(x)\)` using (1) on the leaf containing `\(x\)`.
+
+Propensity trees use only the treatment assignment indicator
+`\(W_i\)` to place splits, therefore, they are honest by design and save the responses `\(Y_i\)` for estimating `\(\hat\tau(x)\)`.
+]]
+
+---
+class: clear
+
+Headerless slide as you wish
+
+---
+
+# Boxes
+
+- .content-box-blue[I'm in this world]
+
+- but I'm not!!
+
+---
+# References
+
+&lt;a name=bib-athey2016recursive&gt;&lt;/a&gt;[Athey, S. and G.
+Imbens](#cite-athey2016recursive) (2016). "Recursive partitioning for
+heterogeneous causal effects". In: _Proceedings of the National Academy
+of Sciences_ 113.27, pp. 7353-7360.
+
+&lt;a name=bib-athey2019generalized&gt;&lt;/a&gt;[Athey, S., J. Tibshirani, S.
+Wager, et al.](#cite-athey2019generalized) (2019). "Generalized random
+forests". In: _Annals of Statistics_ 47.2, pp. 1148-1178.
+
+&lt;a name=bib-athey2019estimating&gt;&lt;/a&gt;[Athey, S. and S.
+Wager](#cite-athey2019estimating) (2019). "Estimating treatment effects
+with causal forests: An application". In: _Observational Studies_ 5,
+pp. 21-35.
+
+&lt;a name=bib-davis2017using&gt;&lt;/a&gt;[Davis, J. and S. B.
+Heller](#cite-davis2017using) (2017). "Using causal forests to predict
+treatment heterogeneity: An application to summer jobs". In: _American
+Economic Review_ 107.5, pp. 546-50.
+
+&lt;a name=bib-oprescu2019orthogonal&gt;&lt;/a&gt;[Oprescu, M., V. Syrgkanis, and
+Z. S. Wu](#cite-oprescu2019orthogonal) (2019). "Orthogonal random
+forest for causal inference". In: _International Conference on Machine
+Learning_. PMLR. , pp. 4932-4941.
+
+&lt;a name=bib-wager2018estimation&gt;&lt;/a&gt;[Wager, S. and S.
+Athey](#cite-wager2018estimation) (2018). "Estimation and inference of
+heterogeneous treatment effects using random forests". In: _Journal of
+the American Statistical Association_ 113.523, pp. 1228-1242.
+
+&lt;a name=bib-wager2014confidence&gt;&lt;/a&gt;[Wager, S., T. Hastie, and B.
+Efron](#cite-wager2014confidence) (2014). "Confidence intervals for
+random forests: The jackknife and the infinitesimal jackknife". In:
+_The Journal of Machine Learning Research_ 15.1, pp. 1625-1651.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightLanguage": "R",
+"highlightStyle": "agate",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>`\n"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -1,0 +1,201 @@
+---
+title: "Causal Forests"
+subtitle: "for heterogeneous treatment effects"
+author: "Rafael Felipe Bressan"
+institute: 
+  - Sao Paulo School of Economics - EESP
+  - FGV - Fundação Getúlio Vargas
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: [default, fgv2-theme.css, fgv2-fonts.css, scrollable.css]
+    lib_dir: libs
+    nature:
+      highlightLanguage: R
+      highlightStyle:  agate #idea #sunburst #solarized-dark # github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      # titleSlideClass: [top, left, inverse]
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>`
+toc: true
+---
+```{r setup, include=FALSE, cache=FALSE}
+options(htmltools.dir.version = FALSE)
+# Set global knitr chunk options
+knitr::opts_chunk$set(
+  fig.align = "center", 
+  cache = FALSE,
+  error = FALSE,
+  message = FALSE, 
+  warning = FALSE, 
+  collapse = TRUE ,
+  echo = FALSE
+)
+
+library(RefManageR)
+BibOptions(check.entries = FALSE, 
+           bib.style = "authoryear", 
+           cite.style = 'authoryear', 
+           style = "markdown",
+           hyperlink = TRUE, 
+           dashed = TRUE,
+           check.entries = FALSE)
+bib <- ReadBib("causalforest.bib")
+```
+
+# Literature Review
+
+Development of Causal Forest comes from a lineage of papers:
+
+- `r Citet(bib, "athey2016recursive")`
+  + Recursive partioning, honest trees
+
+--
+- .bold[`r Citet(bib, "wager2018estimation")`]
+  + .bold[From trees to forests. Asymptotics]
+
+--
+- `r Citet(bib, "athey2019generalized")`
+  + Trees as a kernel regression
+
+--
+- `r Citet(bib, "athey2019estimating")`
+  + Application to observational data
+  
+
+Other important results and applications
+
+- `r Citet(bib, "wager2014confidence")` - Variance estimation
+- `r Citet(bib, "oprescu2019orthogonal")` - Orthogonal Forests
+- `r Citet(bib, "davis2017using")` - Application to summer jobs
+
+---
+# Motivation
+
+* ML methods perform well in practice, but many do not have well established asymptotics or confidence intervals
+
+--
+* Causal Inference is .red[NOT] the same as prediction.
+  + Fundamental problem of causal inference
+
+--
+* Random Forests can potentially address several questions of interest:
+  + Effect heterogeneity among subgroups
+  + Robustness to model specification
+  + Personalized estimates
+
+--
+* Tackle high-dimensional problems
+
+---
+# Potential outcomes framework
+
+We observe a set of i.i.d. units $i = 1, \ldots, n$ whose tuples $(X_i, Y_i, W_i)$ are:
+- Feature .bold[vector] $X_i$,
+- Outcome $Y_i \in \mathbb{R}$
+- Treatment assignement $W_i \in \{0, 1\}$
+
+--
+
+The conditional average treatment effect is defined as: $$\tau(x)=\mathbb{E}[Y_i^{(1)}-Y_i^{(0)}| X_i = x]$$
+where $Y_i^{(0)}$ and $Y_i^{(1)}$ are the potential outcomes when not treated and treated respectively
+
+---
+# .red[Assumptions]
+
+ML is .bold[not dark magic]! We still need to make assumptions to infer the causal effect.
+
+--
+
+Unconfoundedness must hold:
+$$\{Y_i^{(0)}, Y_i^{(1)}\}\perp W_i | X_i$$
+--
+
+All other usual causal inference assumptions: SUTVA, individualistic assignment, probabilistic assignment
+
+---
+# Causal Trees
+
+Units on the same leaf $L(x)$ can be understood as _matched neighbors_
+
+Random forests are essentially an adaptive nearest neighbors estimation
+
+Given traditional causal .red[assumptions], we can treat nearby observations in X-space as having come from a randomized experiment
+
+Natural to estimate the treatment effect locally as:
+
+$$\hat\tau(x)=\frac{1}{|S_1(x)|}\sum_{i\in S_1(x)}Y_i - \frac{1}{|S_0(x)|}\sum_{i\in S_0(x)}Y_i \qquad\text{(1)}$$
+
++ $S_1(x)=\{i:W_i=1, X_i \in L(x)\}$ and $S_0(x)=\{i:W_i=0, X_i \in L(x)\}$
+
+---
+# From Trees to Random Forests 
+
+We have a training set $Z_i=\{(X_i, Y_i, W_i)\}_{i=1}^n$, a set $\mathcal{B}$ of trees and each tree $b\in \mathcal{B}$ provides an estimation through a base learner $T$
+
+$$\hat\tau_b(x)=T(x; Z_i^b)$$
+
+--
+
+.bold[Random forest idea]: grow and average many different trees based on the same learner
+
+$$\hat\tau(x)=\frac{1}{|\mathcal{B}|}\sum_{b\in\mathcal{B}}T(x; Z_i^b)$$
+--
+
+- Different estimations: $T(x; Z_i^b) \neq T(x; Z_i^{b'})$
+  + Subsampling (without replacement, .red[not bagging!])
+  + Random-split trees: randomly select only $m<p$ features to make the split at each step  
+
+---
+# Two Procedures
+
+.footnotesize[
+.pull-left[
+.blue[Double-sample trees]
+
+1. Random subsample of size $s$ from $\{1, \ldots, n\}$
+.bold[without replacement], then $|\mathcal{I}| = s/2$ and $|\mathcal{J}| = s/2$.
+2. Grow a tree via recursive partitioning. The splits are chosen using any data from the $\mathcal{J}$ **and X or W observations** from the $\mathcal{I}$. Honesty. Minimum leaf size $k$.
+3. Estimate leafwise responses using only the $\mathcal{I}$-sample observations.
+
+Double-sample causal trees the prediction estimated is $\hat\tau(x)$ using (1) on the $\mathcal{I}$-sample. Following Athey and Imbens (2016), the splits of the tree are chosen by maximizing the variance of $\hat\tau(X_i)$ for $i\in \mathcal{J}$. Each leaf of the tree must contain $k$ or more $\mathcal{I}$-sample observations of **each** treatment class.
+]]
+
+.footnotesize[
+.pull-right[
+.blue[Propensity trees]
+
+1. Random subsample $\mathcal{I} \in \{1,\ldots, n\}$ of size
+$|\mathcal{I}| = s$ (no replacement).
+2. Train a **classification** tree using sample $\mathcal{I}$ where the
+response is the **treatment assignment**. Using only $(X_i , W_i)$ pairs with $i\in\mathcal{I}$. Each leaf of the tree must have $k$ or more observations of each treatment class.
+3. Estimate $\hat\tau(x)$ using (1) on the leaf containing $x$.
+
+Propensity trees use only the treatment assignment indicator
+$W_i$ to place splits, therefore, they are honest by design and save the responses $Y_i$ for estimating $\hat\tau(x)$.
+]]
+
+---
+class: clear
+
+Headerless slide as you wish
+
+---
+
+# Boxes
+
+- .content-box-blue[I'm in this world]
+
+- but I'm not!!
+
+---
+# References
+
+```{r ref, results = 'asis'}
+PrintBibliography(bib)
+```
