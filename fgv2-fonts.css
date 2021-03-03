@@ -8,17 +8,17 @@
 
 body {
   font-family: 'Fira Sans','Droid Serif', 'Palatino Linotype', 'Book Antiqua', Palatino, 'Microsoft YaHei', 'Songti SC', serif;
-  font-size: 150%;
+  /*font-size: 150%;*/
 }
 
 p {
   font-family: 'Fira Sans','Droid Serif', 'Palatino Linotype', 'Book Antiqua', Palatino, 'Microsoft YaHei', 'Songti SC', serif;
-  font-size: 150%;
+  /*font-size: 150%;*/
 }
 
 ul, li, ol {
   font-family: 'Fira Sans','Droid Serif', 'Palatino Linotype', 'Book Antiqua', Palatino, 'Microsoft YaHei', 'Songti SC', serif;
-  font-size: 100%;
+  /*font-size: 100%;*/
 }
 
 .remark-code, .remark-inline-code {
