@@ -191,6 +191,10 @@ a, a > code {
     border-radius: 2px;  
 }
 
+.shade {
+  text-shadow: 1px 1px 8px black;
+}
+
 .footnote {
   position: absolute;
   bottom: 3em;

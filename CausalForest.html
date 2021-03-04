@@ -33,27 +33,27 @@ class: center, middle, inverse, title-slide
 
 Development of Causal Forest comes from a lineage of papers:
 
-- &lt;a name=cite-athey2016recursive&gt;&lt;/a&gt;[Athey and Imbens (2016)](#bib-athey2016recursive)
+- [Athey and Imbens (2016)](#bib-athey2016recursive)
   + Recursive partioning, honest trees
 
 --
-- .bold[&lt;a name=cite-wager2018estimation&gt;&lt;/a&gt;[Wager and Athey (2018)](#bib-wager2018estimation)]
+- .bold[[Wager and Athey (2018)](#bib-wager2018estimation)]
   + .bold[From trees to forests. Asymptotics]
 
 --
-- &lt;a name=cite-athey2019generalized&gt;&lt;/a&gt;[Athey, Tibshirani, and Wager (2019)](#bib-athey2019generalized)
+- [Athey, Tibshirani, and Wager (2019)](#bib-athey2019generalized)
   + Trees as an adaptive kernel regression
 
 --
-- &lt;a name=cite-athey2019estimating&gt;&lt;/a&gt;[Athey and Wager (2019)](#bib-athey2019estimating)
+- [Athey and Wager (2019)](#bib-athey2019estimating)
   + Application to observational data
   
 
 Other important results and applications
 
-- &lt;a name=cite-wager2014confidence&gt;&lt;/a&gt;[Wager, Hastie, and Efron (2014)](#bib-wager2014confidence) - Variance estimation
-- &lt;a name=cite-oprescu2019orthogonal&gt;&lt;/a&gt;[Oprescu, Syrgkanis, and Wu (2019)](#bib-oprescu2019orthogonal) - Orthogonal Forests
-- &lt;a name=cite-davis2017using&gt;&lt;/a&gt;[Davis and Heller (2017)](#bib-davis2017using) - Application to summer jobs
+- [Wager, Hastie, and Efron (2014)](#bib-wager2014confidence) - Variance estimation
+- [Oprescu, Syrgkanis, and Wu (2019)](#bib-oprescu2019orthogonal) - Orthogonal Forests
+- [Davis and Heller (2017)](#bib-davis2017using) - Application to summer jobs
 
 ---
 # Motivation
@@ -124,20 +124,66 @@ Natural to estimate the treatment effect locally as:
 ---
 # From Trees to Random Forests 
 
-We have a training set `\(Z_i=\{(X_i, Y_i, W_i)\}_{i=1}^n\)`, a set `\(\mathcal{B}\)` of trees and each tree `\(b\in \mathcal{B}\)` provides an estimation through a base learner `\(T\)`
+.footnotesize[
+.pull-left[
+.bold[Original] training set `\(Z_i=\{(X_i, Y_i, W_i)\}_{i=1}^n\)` 
+Set `\(\mathcal{B}\)` of trees and each tree `\(b\in \mathcal{B}\)` 
+provides an estimation through a base learner `\(T\)`
 
 `$$\hat\tau_b(x)=T(x; Z_i^b)$$`
 
---
+]]
 
-.bold[Random forest idea]: grow and average many different trees based on the same learner
+.pull-right[
+![](fig/bagging1.png)
+]
+
+---
+# From Trees to Random Forests 
+
+.footnotesize[
+.pull-left[
+.bold[Original] training set `\(Z_i=\{(X_i, Y_i, W_i)\}_{i=1}^n\)` 
+Set `\(\mathcal{B}\)` of trees and each tree `\(b\in \mathcal{B}\)` 
+provides an estimation through a base learner `\(T\)`
+
+`$$\hat\tau_b(x)=T(x; Z_i^b)$$`
+
+.bold[Random forest idea]
+- Subsampling (without replacement, .red[not bagging!])
+- Random-split trees: randomly select only `\(m&lt;p\)` features to split at each step
+- Different estimations: `\(T(x; Z_i^b) \neq T(x; Z_i^{b'})\)`
+
+]]
+
+.pull-right[
+![](fig/bagging2.png)
+]
+
+---
+# From Trees to Random Forests 
+
+.footnotesize[
+.pull-left[
+.bold[Original] training set `\(Z_i=\{(X_i, Y_i, W_i)\}_{i=1}^n\)` 
+Set `\(\mathcal{B}\)` of trees and each tree `\(b\in \mathcal{B}\)` 
+provides an estimation through a base learner `\(T\)`
+
+`$$\hat\tau_b(x)=T(x; Z_i^b)$$`
+
+.bold[Random forest idea]
+- Subsampling (without replacement, .red[not bagging!])
+- Random-split trees: randomly select only `\(m&lt;p\)` features to split at each step
+- Different estimations: `\(T(x; Z_i^b) \neq T(x; Z_i^{b'})\)`
+
+.bold[Average] many different trees based on the same learner
 
 `$$\hat\tau(x)=\frac{1}{|\mathcal{B}|}\sum_{b\in\mathcal{B}}T(x; Z_i^b)$$`
---
+]]
 
-- Different estimations: `\(T(x; Z_i^b) \neq T(x; Z_i^{b'})\)`
-  + Subsampling (without replacement, .red[not bagging!])
-  + Random-split trees: randomly select only `\(m&lt;p\)` features to make the split at each step  
+.pull-right[
+![](fig/bagging3.png)
+]
 
 ---
 # Two Procedures
@@ -292,7 +338,7 @@ Once we have a .red[Causal Forest] fit, we can visualize a specific tree
 
 Once we have a .red[Causal Forest] fit, we can visualize a specific tree
 
-Or, we can derive an assignment rule as a shallow tree, &lt;a name=cite-AtheyWager2021policy&gt;&lt;/a&gt;([Athey and Wager, 2021](#bib-AtheyWager2021policy))
+Or, we can derive an assignment rule as a shallow tree, ([Athey and Wager, 2021](#bib-AtheyWager2021policy))
 
 &lt;img src="fig/poltree.png" width="80%" style="display: block; margin: auto;" /&gt;
 
@@ -303,8 +349,7 @@ background-image: url(fig/raising-hand.gif)
 background-size: cover
 
 &lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
-.font300.white.bold[Questions?]
-
+.font300.white.bold.shade[Questions?]
 
 ---
 # References

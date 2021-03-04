@@ -154,20 +154,66 @@ $$\hat\tau(x)=\frac{1}{|S_1(x)|}\sum_{i\in S_1(x)}Y_i - \frac{1}{|S_0(x)|}\sum_{
 ---
 # From Trees to Random Forests 
 
-We have a training set $Z_i=\{(X_i, Y_i, W_i)\}_{i=1}^n$, a set $\mathcal{B}$ of trees and each tree $b\in \mathcal{B}$ provides an estimation through a base learner $T$
+.footnotesize[
+.pull-left[
+.bold[Original] training set $Z_i=\{(X_i, Y_i, W_i)\}_{i=1}^n$ 
+Set $\mathcal{B}$ of trees and each tree $b\in \mathcal{B}$ 
+provides an estimation through a base learner $T$
 
 $$\hat\tau_b(x)=T(x; Z_i^b)$$
 
---
+]]
 
-.bold[Random forest idea]: grow and average many different trees based on the same learner
+.pull-right[
+![](fig/bagging1.png)
+]
+
+---
+# From Trees to Random Forests 
+
+.footnotesize[
+.pull-left[
+.bold[Original] training set $Z_i=\{(X_i, Y_i, W_i)\}_{i=1}^n$ 
+Set $\mathcal{B}$ of trees and each tree $b\in \mathcal{B}$ 
+provides an estimation through a base learner $T$
+
+$$\hat\tau_b(x)=T(x; Z_i^b)$$
+
+.bold[Random forest idea]
+- Subsampling (without replacement, .red[not bagging!])
+- Random-split trees: randomly select only $m<p$ features to split at each step
+- Different estimations: $T(x; Z_i^b) \neq T(x; Z_i^{b'})$
+
+]]
+
+.pull-right[
+![](fig/bagging2.png)
+]
+
+---
+# From Trees to Random Forests 
+
+.footnotesize[
+.pull-left[
+.bold[Original] training set $Z_i=\{(X_i, Y_i, W_i)\}_{i=1}^n$ 
+Set $\mathcal{B}$ of trees and each tree $b\in \mathcal{B}$ 
+provides an estimation through a base learner $T$
+
+$$\hat\tau_b(x)=T(x; Z_i^b)$$
+
+.bold[Random forest idea]
+- Subsampling (without replacement, .red[not bagging!])
+- Random-split trees: randomly select only $m<p$ features to split at each step
+- Different estimations: $T(x; Z_i^b) \neq T(x; Z_i^{b'})$
+
+.bold[Average] many different trees based on the same learner
 
 $$\hat\tau(x)=\frac{1}{|\mathcal{B}|}\sum_{b\in\mathcal{B}}T(x; Z_i^b)$$
---
+]]
 
-- Different estimations: $T(x; Z_i^b) \neq T(x; Z_i^{b'})$
-  + Subsampling (without replacement, .red[not bagging!])
-  + Random-split trees: randomly select only $m<p$ features to make the split at each step  
+.pull-right[
+![](fig/bagging3.png)
+]
 
 ---
 # Two Procedures
@@ -384,8 +430,7 @@ background-image: url(fig/raising-hand.gif)
 background-size: cover
 
 <br><br><br><br><br><br><br><br><br><br><br><br><br>
-.font300.white.bold[Questions?]
-`r # anicon::nia("Questions?", animate = "pulse")`
+.font300.white.bold.shade[Questions?]
 
 ---
 # References
