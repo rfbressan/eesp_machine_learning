@@ -4,7 +4,7 @@
     <title>Causal Forests </title>
     <meta charset="utf-8" />
     <meta name="author" content="Rafael Felipe Bressan" />
-    <meta name="date" content="2021-03-03" />
+    <meta name="date" content="2021-03-04" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <script src="libs/kePrint/kePrint.js"></script>
     <link href="libs/lightable/lightable.css" rel="stylesheet" />
@@ -22,7 +22,7 @@ class: center, middle, inverse, title-slide
 ### Rafael Felipe Bressan
 ### Sao Paulo School of Economics - EESP
 ### FGV - Fundação Getúlio Vargas
-### 2021-03-03
+### 2021-03-04
 
 ---
 
@@ -297,6 +297,16 @@ Or, we can derive an assignment rule as a shallow tree, &lt;a name=cite-AtheyWag
 &lt;img src="fig/poltree.png" width="80%" style="display: block; margin: auto;" /&gt;
 
 ---
+class: clear, center, middle
+
+background-image: url(fig/raising-hand.gif)
+background-size: cover
+
+&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
+.font300.white.bold[Questions?]
+
+
+---
 # References
 
 .footnotesize[
@@ -338,15 +348,6 @@ Efron](#cite-wager2014confidence) (2014). "Confidence intervals for
 random forests: The jackknife and the infinitesimal jackknife". In:
 _The Journal of Machine Learning Research_ 15.1, pp. 1625-1651.
 ]
-
----
-class: clear, center, middle
-
-background-image: url(fig/raising-hand.gif)
-background-size: cover
-
-&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
-.font300.white.bold[Questions?]
 
 ---
 # Appendix
@@ -426,12 +427,13 @@ Other interesting resources and papers:
 - Chang, N. C. (2020). Double/debiased machine learning for difference-in-differences models. The Econometrics Journal, 23(2), 177-191.
 - [Rahul Singh, Liyang Sun. (2021). De-biased Machine Learning in Instrumental Variable Models for Treatment Effects. Unpublished Manuscript](http://economics.mit.edu/files/20420)
 - Syrgkanis, V., Lei, V., Oprescu, M., Hei, M., Battocchi, K., &amp; Lewis, G. (2019). Machine learning estimation of heterogeneous treatment effects with instruments. arXiv preprint [arXiv:1905.10176](https://arxiv.org/abs/1905.10176).
-- Bressan, R. (2021). [INFERÊNCIA CAUSAL COM MACHINE LEARNING: uma aplicação para evasão fiscal](https://www.overleaf.com/read/njxdsjrtxqnm). Trabalho de conclusão de curso. PUC-MG. [Github](https://github.com/rfbressan/curso_big_data)
+- Bressan, R. F. (2021). [INFERÊNCIA CAUSAL COM MACHINE LEARNING: uma aplicação para evasão fiscal](https://www.overleaf.com/read/njxdsjrtxqnm). Trabalho de conclusão de curso. PUC-MG. [Github](https://github.com/rfbressan/curso_big_data)
 ]
 
 ---
 # Appendix - Generalized Random Forests
 
+.small[
 Adaptive kernel
 
 `$$\hat{\mu}(x)=\sum_{i=1}^{n} \alpha_{i}(x) Y_{i}, \quad \alpha_{i}(x)=\frac{1}{B} \sum_{b=1}^{B} \frac{\mathbf{1}\left(\left\{X_{i} \in L_{b}(x), i \in \mathcal{S}_{b}\right\}\right)}{\left|\left\{i: X_{i} \in L_{b}(x), i \in \mathcal{S}_{b}\right\}\right|}$$`
@@ -446,6 +448,7 @@ Augmented inverse propensity weighting
 \hat{\tau}_{j}=\frac{1}{n_{j}} \sum_{\left\{i: A_{i}=j\right\}} \widehat{\Gamma}_{i}, \quad \hat{\tau}=\frac{1}{J} \sum_{j=1}^{J} \hat{\tau}_{j}, \quad \hat{\sigma}^{2}=\frac{1}{J(J-1)} \sum_{j=1}^{J}\left(\hat{\tau}_{j}-\hat{\tau}\right)^{2} \\
 \widehat{\Gamma}_{i}=\hat{\tau}^{(-i)}\left(X_{i}\right)+\frac{W_{i}-\hat{e}^{(-i)}\left(X_{i}\right)}{\hat{e}^{(-i)}\left(X_{i}\right)\left(1-\hat{e}^{(-i)}\left(X_{i}\right)\right)}\left(Y_{i}-\hat{m}^{(-i)}\left(X_{i}\right)-\left(W_{i}-\hat{e}^{(-i)}\left(X_{i}\right)\right) \hat{\tau}^{(-i)}\left(X_{i}\right)\right)
 \end{array}$$`
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
