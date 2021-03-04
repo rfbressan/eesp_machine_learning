@@ -1,5 +1,5 @@
 ---
-title: "Causal Forests <img src='fig/FGV-Logo-3.png' width=200 style='float:right'/>"
+title: "Causal Forests <img src='fig/FGV-Logo-3.png' width=250 style='float:right'/>"
 subtitle: "for heterogeneous treatment effects <br><hr>"
 author: "Rafael Felipe Bressan"
 institute: 
@@ -72,7 +72,7 @@ Development of Causal Forest comes from a lineage of papers:
 
 --
 - `r Citet(bib, "athey2019generalized")`
-  + Trees as a kernel regression
+  + Trees as an adaptive kernel regression
 
 --
 - `r Citet(bib, "athey2019estimating")`
@@ -250,8 +250,9 @@ Going from random forests to causal forests is trivial. Adapt definitions of hon
 ---
 # Application
 
-`r Citet(bib, "athey2019estimating")` apply Causal Forests to investigate heterogeneity on the National Study of Learning Mindsets
+`r Citet(bib, "athey2019estimating")` apply Causal Forests to investigate heterogeneity on the **National Study of Learning Mindsets**
 
+--
 NSLM: U.S. public high schools. Evaluate the impact of a nudge-like intervention designed to instill students with a growth mindset<sup>2</sup> on student achievement
 
 NSLM was randomized, but there seems to be some selection effects
@@ -424,6 +425,34 @@ kbl(vars_tb, col.names = c("Variables", "Description")) %>%
 ```
 
 ---
-# Appendix
+# Appendix - Resources
 
+.small[
 This presentation is publicly available at my `r fa("github", fill = "blue")` Github repo [https://github.com/rfbressan/eesp_machine_learning](https://github.com/rfbressan/eesp_machine_learning)
+
+Other interesting resources and papers:
+- [EconML](https://econml.azurewebsites.net/): Python library for Machine Learning methods to causal inference
+- Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., Hansen, C., Newey, W., & Robins, J. (2018). Double/debiased machine learning for treatment and structural parameters. The Econometrics Journal, 21(1), C1-C68.
+- Chang, N. C. (2020). Double/debiased machine learning for difference-in-differences models. The Econometrics Journal, 23(2), 177-191.
+- [Rahul Singh, Liyang Sun. (2021). De-biased Machine Learning in Instrumental Variable Models for Treatment Effects. Unpublished Manuscript](http://economics.mit.edu/files/20420)
+- Syrgkanis, V., Lei, V., Oprescu, M., Hei, M., Battocchi, K., & Lewis, G. (2019). Machine learning estimation of heterogeneous treatment effects with instruments. arXiv preprint [arXiv:1905.10176](https://arxiv.org/abs/1905.10176).
+- Bressan, R. (2021). [INFERÊNCIA CAUSAL COM MACHINE LEARNING: uma aplicação para evasão fiscal](https://www.overleaf.com/read/njxdsjrtxqnm). Trabalho de conclusão de curso. PUC-MG. [Github](https://github.com/rfbressan/curso_big_data)
+]
+
+---
+# Appendix - Generalized Random Forests
+
+Adaptive kernel
+
+$$\hat{\mu}(x)=\sum_{i=1}^{n} \alpha_{i}(x) Y_{i}, \quad \alpha_{i}(x)=\frac{1}{B} \sum_{b=1}^{B} \frac{\mathbf{1}\left(\left\{X_{i} \in L_{b}(x), i \in \mathcal{S}_{b}\right\}\right)}{\left|\left\{i: X_{i} \in L_{b}(x), i \in \mathcal{S}_{b}\right\}\right|}$$
+
+Doubly-robust regression
+
+$$\hat{\tau}=\frac{\sum_{i=1}^{n} \alpha_{i}(x)\left(Y_{i}-\hat{m}^{(-i)}\left(X_{i}\right)\right)\left(W_{i}-\hat{e}^{(-i)}\left(X_{i}\right)\right)}{\sum_{i=1}^{n} \alpha_{i}(x)\left(W_{i}-\hat{e}^{(-i)}\left(X_{i}\right)\right)^{2}}$$
+
+Augmented inverse propensity weighting
+
+$$\begin{array}{l}
+\hat{\tau}_{j}=\frac{1}{n_{j}} \sum_{\left\{i: A_{i}=j\right\}} \widehat{\Gamma}_{i}, \quad \hat{\tau}=\frac{1}{J} \sum_{j=1}^{J} \hat{\tau}_{j}, \quad \hat{\sigma}^{2}=\frac{1}{J(J-1)} \sum_{j=1}^{J}\left(\hat{\tau}_{j}-\hat{\tau}\right)^{2} \\
+\widehat{\Gamma}_{i}=\hat{\tau}^{(-i)}\left(X_{i}\right)+\frac{W_{i}-\hat{e}^{(-i)}\left(X_{i}\right)}{\hat{e}^{(-i)}\left(X_{i}\right)\left(1-\hat{e}^{(-i)}\left(X_{i}\right)\right)}\left(Y_{i}-\hat{m}^{(-i)}\left(X_{i}\right)-\left(W_{i}-\hat{e}^{(-i)}\left(X_{i}\right)\right) \hat{\tau}^{(-i)}\left(X_{i}\right)\right)
+\end{array}$$
