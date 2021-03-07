@@ -4,7 +4,6 @@
     <title>Causal Forests </title>
     <meta charset="utf-8" />
     <meta name="author" content="Rafael Felipe Bressan" />
-    <meta name="date" content="2021-03-04" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <script src="libs/kePrint/kePrint.js"></script>
     <link href="libs/lightable/lightable.css" rel="stylesheet" />
@@ -22,7 +21,7 @@ class: center, middle, inverse, title-slide
 ### Rafael Felipe Bressan
 ### Sao Paulo School of Economics - EESP
 ### FGV - Fundação Getúlio Vargas
-### 2021-03-04
+### March 8th, 2021
 
 ---
 
@@ -33,27 +32,27 @@ class: center, middle, inverse, title-slide
 
 Development of Causal Forest comes from a lineage of papers:
 
-- [Athey and Imbens (2016)](#bib-athey2016recursive)
+- &lt;a name=cite-athey2016recursive&gt;&lt;/a&gt;[Athey and Imbens (2016)](#bib-athey2016recursive)
   + Recursive partioning, honest trees
 
 --
-- .bold[[Wager and Athey (2018)](#bib-wager2018estimation)]
+- .bold[&lt;a name=cite-wager2018estimation&gt;&lt;/a&gt;[Wager and Athey (2018)](#bib-wager2018estimation)]
   + .bold[From trees to forests. Asymptotics]
 
 --
-- [Athey, Tibshirani, and Wager (2019)](#bib-athey2019generalized)
+- &lt;a name=cite-athey2019generalized&gt;&lt;/a&gt;[Athey, Tibshirani, and Wager (2019)](#bib-athey2019generalized)
   + Trees as an adaptive kernel regression
 
 --
-- [Athey and Wager (2019)](#bib-athey2019estimating)
+- &lt;a name=cite-athey2019estimating&gt;&lt;/a&gt;[Athey and Wager (2019)](#bib-athey2019estimating)
   + Application to observational data
   
 
 Other important results and applications
 
-- [Wager, Hastie, and Efron (2014)](#bib-wager2014confidence) - Variance estimation
-- [Oprescu, Syrgkanis, and Wu (2019)](#bib-oprescu2019orthogonal) - Orthogonal Forests
-- [Davis and Heller (2017)](#bib-davis2017using) - Application to summer jobs
+- &lt;a name=cite-wager2014confidence&gt;&lt;/a&gt;[Wager, Hastie, and Efron (2014)](#bib-wager2014confidence) - Variance estimation
+- &lt;a name=cite-oprescu2019orthogonal&gt;&lt;/a&gt;[Oprescu, Syrgkanis, and Wu (2019)](#bib-oprescu2019orthogonal) - Orthogonal Forests
+- &lt;a name=cite-davis2017using&gt;&lt;/a&gt;[Davis and Heller (2017)](#bib-davis2017using) - Application to summer jobs
 
 ---
 # Motivation
@@ -338,7 +337,7 @@ Once we have a .red[Causal Forest] fit, we can visualize a specific tree
 
 Once we have a .red[Causal Forest] fit, we can visualize a specific tree
 
-Or, we can derive an assignment rule as a shallow tree, ([Athey and Wager, 2021](#bib-AtheyWager2021policy))
+Or, we can derive an assignment rule as a shallow tree, &lt;a name=cite-AtheyWager2021policy&gt;&lt;/a&gt;([Athey and Wager, 2021](#bib-AtheyWager2021policy))
 
 &lt;img src="fig/poltree.png" width="80%" style="display: block; margin: auto;" /&gt;
 

@@ -5,7 +5,7 @@ author: "Rafael Felipe Bressan"
 institute: 
   - Sao Paulo School of Economics - EESP
   - FGV - Fundação Getúlio Vargas
-date: "`r Sys.Date()`"
+date: "March 8th, 2021"
 output:
   xaringan::moon_reader:
     css: [fgv2-theme.css, fgv2-fonts.css, scrollable.css]
